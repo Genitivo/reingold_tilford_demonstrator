@@ -15,13 +15,13 @@ var tree = d3.layout.tree()
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x] })
 
-var svg = d3.select("body").append("svg")
+var svg_container = d3.select("body").append("svg")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
-  .append("g")
+var svg = svg_container.append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-    // create the editor
 
+// create the editor
 var container = document.getElementById("jsoneditor")
 var options = {
   modes: ['text', 'tree']
@@ -31,37 +31,29 @@ var editor = new JSONEditor(container, options)
 // set json
 var json = {
   "name": 1,
-"livello":0,
   "children": [
     {
       "name": 3,
-"livello":1,
       "children": [
         {
           "name": 6,
-"livello":2,
           "children": [
             {
               "name": 56,
-"livello":3,
             },
             {
               "name": 64,
-"livello":3,
             }
           ]
         },
         {
           "name": 5,
-"livello":2,
           "children": [
             {
               "name": 33,
-"livello":3,
             },
             {
               "name": 44,
-"livello":3,
             }
           ]
         }
@@ -69,33 +61,26 @@ var json = {
     },
     {
       "name": 7,
-"livello":1,
       "children": [
         {
           "name": 8,
-"livello":2,
           "children": [
             {
               "name": 76,
-"livello":3,
             },
             {
               "name": 90,
-"livello":3,
             }
           ]
         },
         {
           "name": 10,
-"livello":2,
           "children": [
             {
               "name": 85,
-"livello":3,
             },
             {
               "name": 12,
-"livello":2,
             }
           ]
         }
@@ -241,9 +226,10 @@ function nodiApertiALivello(lvl){
 
   var n = 0
   var figli = []
+  console.log(openNodes)
 
-  for(i in openNodes){
-    var node = Object.assign({},openNodes[i])
+  for(index = 0; index < openNodes.length; ++index){
+    var node = openNodes[index]
 
     figli = node.children != undefined ? node.children : node._children
     if(node.depth+1===lvl)
@@ -266,40 +252,54 @@ function showChildren(d){
 
 }
 
+function isOpen(d){
+
+  for(index = 0; index < openNodes.length; ++index){
+    console.log(openNodes[index].id,d.id)
+    if(openNodes[index].id===d.id)
+      return true
+  }
+  return false
+}
+
 // Toggle children on click.
 function click(d) {
 
-  nodeFocus = false
-
-  var son_sons = "i"
-  if(d._children.length===1){
-    son_sons = "io"
+  if(isOpen(d)){
+    showChildren(d)
   }
+  else{
+    nodeFocus = false
 
-  var newContent = "<p>" + " Il nodo ha "+d._children.length+" figl"+son_sons+ ".</p>"
-  newContent += "<p><b> Children:</b> </p><p><ul>"
-  for (x in d._children) {
-    newContent += "<li><b> Value:</b> " + d._children[x].name + "</li>"
-  }
-  newContent += "</ul></p>"
-  newContent += "<p> Il nodo <b>"+ d._children[0].name+"</b> andrà a prendere la posizione del nodo padre.</p>"
+    var son_sons = d._children.length===1 ? "io" : "i"
 
-  if(d._children.length===2){
-    newContent += "<p> La coordinata x del nodo <b>" +d.name+ "</b> sarà la media delle coordinate x dei suoi figli.</p>"
-  }
-  else {
-    newContent += "<p> La coordinata x del nodo <b>" +d.name+ "</b> rimarrà invariata.</p>"
-  }
-  var nodo = Object.assign({},d)
+    var newContent = "<p>" + " Il nodo <b>" +d.name+ "</b> ha <b>"+d._children.length+"</b> figl"+son_sons+ ".</p>"
+    newContent += "<p><b> Figli:</b> </p><p><ul>"
+    for (x in d._children) {
+      newContent += "<li><b> Valore:</b> " + d._children[x].name + "</li>"
+    }
+    newContent += "</ul></p>"
+    newContent += "<p> Il nodo <b>"+ d._children[0].name+"</b> andrà a prendere la posizione del nodo padre.</p>"
 
-  if(d._children.length>0)
-    if(nodiApertiALivello(nodo.depth+1)>1){
-      newContent += "<p> Tutti i nodi a livello <b>"+d.depth+"</b> subiranno stocazzo.</p>"
+    if(d._children.length===2){
+      newContent += "<p> La coordinata x del nodo <b>" +d.name+ "</b> sarà la media delle coordinate x dei suoi figli.</p>"
+    }
+    else {
+      newContent += "<p> La coordinata x del nodo <b>" +d.name+ "</b> rimarrà invariata.</p>"
+    }
+    var nodo = Object.assign({},d)
+
+    if(d._children.length>0){
+      if(nodiApertiALivello(nodo.depth+1)>1)
+        newContent += "<p> L'i-esimo nodo del contorno sinistro del sotto albero destro, sarà posto a distanza due dal'i-esimo nodo del contorno destro del sotto albero sinistro. La distanza fra i loro padri verrà raddoppiata.</p>"
+      else
+        newContent += "<p> Non essendoci nodi a livello <b>"+(nodo.depth+1)+"</b>, i figli di <b>" +d.name+ "</b> possono occupare tutto lo spazio.</p>"
     }
 
-  d3.select("#modal").style("display", "block").select("#content").html(newContent)
-  currentOpenNode = d
-  openNodes.push(nodo)
+    d3.select("#modal").style("display", "block").select("#content").html(newContent)
+    currentOpenNode = d
+    openNodes.push(nodo)
+  }
 }
 
 function nodeOut() {
@@ -316,7 +316,8 @@ function nodeOut() {
 
 function updateJson(){
   var json = editor.get()
-  d3.select("svg").attr("height", -tree_height - margin.top - margin.bottom)
+  let new_height = document.getElementById("tree_height").value
+  svg_container.attr("height", new_height + margin.top + margin.bottom)
 
   updateTree(json)
 }
