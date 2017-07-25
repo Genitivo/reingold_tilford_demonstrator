@@ -1,6 +1,50 @@
-<!DOCTYPE html>
-<meta charset="utf-8">
 <style type="text/css">
+body {
+  font-family: Arial, sans-serif;
+  background: #ddd;
+}
+
+h1 {
+  text-align: center;
+  font-family: "Trebuchet MS", Tahoma, Arial, sans-serif;
+  color: #333;
+  text-shadow: 0 1px 0 #fff;
+  margin: 50px 0;
+}
+
+#wrapper {
+  width: 100px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 20px;
+  border: 10px solid #aaa;
+  border-radius: 15px;
+  background-clip: padding-box;
+  text-align: center;
+}
+
+.button {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 13px;
+  padding: 5px 10px;
+  border: 1px solid #aaa;
+  background-color: #eee;
+  background-image: linear-gradient(top, #fff, #f0f0f0);
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  color: #666;
+  text-decoration: none;
+  text-shadow: 0 1px 0 #fff;
+  cursor: pointer;
+  transition: all 0.2s ease-out;
+}
+.button:hover {
+  border-color: #999;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+.button:active {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25) inset;
+}
 
 .overlay {
   position: absolute;
@@ -72,65 +116,29 @@
   margin: 0;
 }
 
-.button {
-    background-color:#3883fa;
-    border-radius: 5px;
-    border-color: #4b4b4b;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 17px;
-    margin: 4px 2px;
-    cursor: pointer;
-}
-
-.node {
-  cursor: pointer;
-}
-
-.node circle {
-  fill: #fff;
-  stroke: steelblue;
-  stroke-width: 1.5px;
-}
-
-.node text {
-  font: 10px sans-serif;
-}
-
-.link {
-  fill: none;
-  stroke: #ccc;
-  stroke-width: 1.5px;
-}
-
-#jsoneditor {
-  height: 300px;
-}
-
 </style>
-<body>
-<script src="./js/jquery-1.10.2.min.js"></script>
-<script src="./js/d3.v3.min.js"></script>
-<head>
-    <link href="./node_modules/jsoneditor/dist/jsoneditor.min.css" rel="stylesheet" type="text/css">
-    <script src="./node_modules/jsoneditor/dist/jsoneditor.min.js"></script>
-</head>
-<button name="updteJson" onClick="updateJson()" class="button">Update</button>
-<label> Tree height:
-  <input type="number" id="tree_height" value=400 style="width:40px" />
-</label>
-<div id="jsoneditor" style={width:400px}></div>
-<script src="script.js"></script>
-</script>
+<h1>Popup/Modal Windows without JavaScript</h1>
+<div id="wrapper">
+  <p><a class="button" href="#popup1">Click Me</a></p>
+	<p><a class="button" href="#popup2">Click Me Too</a></p>
+</div>
+
 <div id="popup1" class="overlay">
 	<div class="popup">
 		<h2>Info box</h2>
 		<a class="close" href="#">&times;</a>
 		<div class="content">
 			<p>This is done totally without JavaScript. Just HTML and CSS.</p>
+		</div>
+	</div>
+</div>
+
+<div id="popup2" class="overlay light">
+	<a class="cancel" href="#"></a>
+	<div class="popup">
+		<h2>What the what?</h2>
+		<div class="content">
+      <p>Click outside the popup to close.</p>
 		</div>
 	</div>
 </div>
