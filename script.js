@@ -226,9 +226,7 @@ function nodiApertiALivello(lvl){
 
   var n = 0
   var figli = []
-  console.log(openNodes)
 
-  @// trasformare in .forEach
   for(index = 0; index < openNodes.length; ++index){
     var node = openNodes[index]
 
@@ -256,7 +254,6 @@ function showChildren(d){
 function isOpen(d){
 
   for(index = 0; index < openNodes.length; ++index){
-    console.log(openNodes[index].id,d.id)
     if(openNodes[index].id===d.id)
       return true
   }
@@ -291,12 +288,9 @@ function click(d) {
     var nodo = Object.assign({},d)
 
     if(d._children.length>0){
-      if(nodiApertiALivello(nodo.depth+1)>1){
+      if(nodiApertiALivello(nodo.depth+1)>1)
         newContent += "<p> L'i-esimo nodo del contorno sinistro del sotto albero destro, sarà posto a distanza due dal'i-esimo nodo del contorno destro del sotto albero sinistro. La distanza fra i loro padri verrà raddoppiata.</p>"
-        @// Cambiare il messaggio
-        @// Trovare i controni con gli i-esimi nodi dal json
-        @// Aggiungere nuovi messaggi se volete
-    }else
+      else
         newContent += "<p> Non essendoci nodi a livello <b>"+(nodo.depth+1)+"</b>, i figli di <b>" +d.name+ "</b> possono occupare tutto lo spazio.</p>"
     }
 
