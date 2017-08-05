@@ -96,7 +96,7 @@ function updateTree(new_json){
   root.x0 = height / 2
   root.y0 = 0
 
-  root.children.forEach(collapse)
+  // root.children.forEach(collapse)
   update(root)
 }
 
@@ -112,9 +112,9 @@ updateTree(json)
 
 d3.select(self.frameElement).style("height", "800px")
 
-function update(source) {
-  tree_height = document.getElementById("tree_height").value
+function update(source, profondita, nodo) {
 
+  tree_height = document.getElementById("tree_height").value
   height = tree_height - margin.top - margin.bottom
 
   tree = d3.layout.tree()
@@ -124,8 +124,7 @@ function update(source) {
   var nodes = tree.nodes(root).reverse(),
       links = tree.links(nodes)
 
-  // Normalize for fixed-depth.
-  nodes.forEach(function(d) { d.y = d.depth * 180 })
+  nodes.forEach(function(d) { d.y = d.depth * Math.floor((Math.random() * 100) + 1)})
 
   // Update the nodes…
   var node = svg.selectAll("g.node")
@@ -226,6 +225,7 @@ function nodiApertiALivello(lvl){
 
   var n = 0
   var figli = []
+  console.log(openNodes)
 
   for(index = 0; index < openNodes.length; ++index){
     var node = openNodes[index]
@@ -254,6 +254,7 @@ function showChildren(d){
 function isOpen(d){
 
   for(index = 0; index < openNodes.length; ++index){
+    console.log(openNodes[index].id,d.id)
     if(openNodes[index].id===d.id)
       return true
   }
@@ -318,4 +319,40 @@ function updateJson(){
   svg_container.attr("height", new_height + margin.top + margin.bottom)
 
   updateTree(json)
+}
+
+var num_click = 0
+
+function nextSlide(){
+  let num_even = (num_click % 2==0) && num_click !=0  && num_click % 10!=0
+
+  var nodes = tree.nodes(root).reverse().splice(num_even ? 0 : num_click, num_even ? num_click : 3),
+      links = tree.links(nodes)
+
+  nodes.forEach(function(d){return console.log(d.name) })
+
+  var node = svg.selectAll("g.node")
+      .data(nodes, function(d) { return d.id || (d.id = ++i) })
+  var link = svg.selectAll("path.link")
+      .data(links, function(d) { return d.target.id })
+
+  nodes.forEach(function(d) { d.y = d.depth * 180 })
+
+  var nodeUpdate = node.transition()
+      .duration(duration)
+      .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"})
+
+  link.transition()
+      .duration(duration)
+      .attr("d", diagonal)
+
+  nodes.forEach(function(d) {
+    d.x0 = d.x
+    d.y0 = d.y
+  })
+
+  if(num_even)
+    num_click = num_click + 1
+  else
+    num_click = num_click + 3
 }
