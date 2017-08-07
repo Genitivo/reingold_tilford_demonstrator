@@ -7,13 +7,16 @@
     <link href="./node_modules/jsoneditor/dist/jsoneditor.min.css" rel="stylesheet" type="text/css">
     <script src="./node_modules/jsoneditor/dist/jsoneditor.min.js"></script>
 </head>
-<button name="updteJson" onClick="updateJson()" class="button">Update</button>
+<button id="updateJsonButton" onClick="updateJson()" class="button">Update</button>
 <label> Tree height:
   <input type="number" id="tree_height" value=400 style="width:40px" />
 </label>
 <div id="jsoneditor" style={width:400px}></div>
 <div id="modal"><div id="content"></div><button id="modalClose" onclick="nodeFocus=false;nodeOut();d3.select('#modal').style('display','none');">Avanti</button></div>
 <script src="./node_modules/tree-model/dist/TreeModel-min.js"></script>
-<button name="Next" onClick="nextSlide()" class="button">Next</button>
+<div>
+  <button id="startButton" onClick="startDemonstrator()" class="button">Start</button>
+  <button id="nextButton" onClick="nextSlide()" class="button">Next</button>
+</div>
 <script src="script.js"></script>
 </script>

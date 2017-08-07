@@ -84,7 +84,7 @@
   margin: 0;
 }
 
-.button {
+#updateJsonButton {
     background-color:#3883fa;
     border-radius: 5px;
     border-color: #4b4b4b;
@@ -96,6 +96,35 @@
     font-size: 17px;
     margin: 4px 2px;
     cursor: pointer;
+}
+
+#startButton {
+    background-color: green;
+    border-radius: 5px;
+    border-color: #4b4b4b;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 17px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+#nextButton{
+    background-color: grey;
+    border-radius: 5px;
+    border-color: #4b4b4b;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 17px;
+    margin: 4px 2px;
+    cursor: pointer;
+    disabled: true;
 }
 
 .node {

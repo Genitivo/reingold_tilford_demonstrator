@@ -318,15 +318,37 @@ function updateJson(){
   let new_height = document.getElementById("tree_height").value
   svg_container.attr("height", new_height + margin.top + margin.bottom)
 
+  var startButton = document.getElementById("startButton");
+  startButton.style.backgroundColor = "green"
+  startButton.removeAttribute("disabled");
+
+  var nextButton = document.getElementById("nextButton");
+  nextButton.style.backgroundColor = "grey"
+  nextButton.setAttribute("disabled","disabled");
+
   updateTree(json)
 }
 
-var num_click = 0
+var num_click
+
+function startDemonstrator(){
+  num_click = 0
+
+  var startButton = document.getElementById("startButton");
+  startButton.style.backgroundColor = "grey"
+  startButton.setAttribute("disabled","disabled");
+
+  var nextButton = document.getElementById("nextButton");
+  nextButton.style.backgroundColor = "#3883fa"
+  nextButton.removeAttribute("disabled");
+
+  nextSlide()
+}
 
 function nextSlide(){
   let num_even = (num_click % 2==0) && num_click !=0  && num_click % 10!=0
 
-  var nodes = tree.nodes(root).reverse().splice(num_even ? 0 : num_click, num_even ? num_click : 3),
+  var nodes = tree.nodes(root).reverse().splice(num_even ? 0 : num_click, num_even ? num_click +1: 3),
       links = tree.links(nodes)
 
   nodes.forEach(function(d){return console.log(d.name) })
