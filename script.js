@@ -124,7 +124,10 @@ function update(source, profondita, nodo) {
   var nodes = tree.nodes(root).reverse(),
       links = tree.links(nodes)
 
-  nodes.forEach(function(d) { d.y = d.depth * Math.floor((Math.random() * 100) + 1)})
+  nodes.forEach(function(d) {
+    console.log(`${d.name}`)
+    d.x = d.x + Math.floor((Math.random() * 10) + 1)
+    d.y = d.depth * Math.floor((Math.random() * 100) + 1)})
 
   // Update the nodes…
   var node = svg.selectAll("g.node")
@@ -339,26 +342,54 @@ function startDemonstrator(){
   startButton.setAttribute("disabled","disabled");
 
   var nextButton = document.getElementById("nextButton");
-  nextButton.style.backgroundColor = "#3883fa"
+  nextButton.style.backgroundColor = "green"
   nextButton.removeAttribute("disabled");
 
   nextSlide()
 }
 
+var orderedNodes = []
+
 function nextSlide(){
-  let num_even = (num_click % 2==0) && num_click !=0  && num_click % 10!=0
 
-  var nodes = tree.nodes(root).reverse().splice(num_even ? 0 : num_click, num_even ? num_click +1: 3),
-      links = tree.links(nodes)
+  var nodes = tree.nodes(root).reverse()
 
-  nodes.forEach(function(d){return console.log(d.name) })
+  let i = 0
+  let subtree = false
+
+  nodes.forEach(function(d,index){
+
+    if(orderedNodes.indexOf(d)==-1){
+
+      if(d.children && i==0 && !subtree){
+        orderedNodes.push(d)
+        subtree = true
+      }
+
+      if(d.children && (i==1 || i==2) && !subtree){
+        orderedNodes.push(d)
+        subtree = true
+        i = i+1
+      }else{
+        if(((i==1 && !(d in orderedNodes)) || i==0) && !subtree){
+          orderedNodes.push(d)
+          i = i+1
+        }
+      }
+
+    }
+  })
+
+  orderedNodes.forEach((d) => console.log(d.name))
+
+  var links = tree.links(orderedNodes)
 
   var node = svg.selectAll("g.node")
-      .data(nodes, function(d) { return d.id || (d.id = ++i) })
+      .data(orderedNodes, function(d) { return d.id || (d.id = ++i) })
   var link = svg.selectAll("path.link")
       .data(links, function(d) { return d.target.id })
 
-  nodes.forEach(function(d) { d.y = d.depth * 180 })
+  orderedNodes.forEach(function(d) { d.y = d.depth * 180 })
 
   var nodeUpdate = node.transition()
       .duration(duration)
@@ -368,13 +399,16 @@ function nextSlide(){
       .duration(duration)
       .attr("d", diagonal)
 
-  nodes.forEach(function(d) {
+  orderedNodes.forEach(function(d) {
     d.x0 = d.x
     d.y0 = d.y
   })
 
-  if(num_even)
-    num_click = num_click + 1
-  else
-    num_click = num_click + 3
+  if(orderedNodes.length == nodes.length){
+    var nextButton = document.getElementById("nextButton");
+    nextButton.style.backgroundColor = "red"
+    nextButton.text = "Done"
+    nextButton.setAttribute("disabled","disabled");
+  }
+
 }
