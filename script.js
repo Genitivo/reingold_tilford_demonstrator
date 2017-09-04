@@ -1,8 +1,8 @@
 var tree_height = document.getElementById("tree_height").value
 
 var margin = {top: 20, right: 120, bottom: 20, left: 120},
-    width = 960 - margin.right - margin.left,
-    height = tree_height - margin.top - margin.bottom
+    width = $(document).width() - margin.right - margin.left,
+    height = $(document).height() - margin.top - margin.bottom
 
 var i = 0,
     duration = 750,
@@ -369,6 +369,7 @@ function nextSlide(){
   nodeForTutorial.forEach((d) => console.log(d.name))
   console.log("___________________________")
 
+
   showTutorial(nodeForTutorial)
 
 
@@ -423,6 +424,9 @@ function renderedAnimation(){
 }
 
 function showTutorial() {
+  var nextButton = document.getElementById("nextButton");
+  nextButton.style.backgroundColor = "yellow"
+  nextButton.setAttribute("disabled","disabled");
 
   nodeFocus = false
   var newContent = ""
@@ -444,7 +448,7 @@ function showTutorial() {
 
       if(father.children.length===2){
         child_dx = father.children[0]
-        newContent += `<p> Il nodo <b>${father.name}</b> ha 2 figli:</p><p><ul> `
+        newContent += `<p> Il sotto albero da riordinare ha come radice il nodo <b>${father.name}</b> che ha 2 figli:</p><p><ul> `
         newContent += `<li><b> Figlio Sinistro:</b> ${child_sx.name} </li>`
         newContent += `<li><b> Figlio Destro:</b> ${child_dx.name} </li>`
         newContent += "</ul></p>"
@@ -480,13 +484,15 @@ function showTutorial() {
       break
     }
   }
-
-  newContent += `<p> LESGHEREEE </p>`
   d3.select("#modal").style("display", "block").select("#content").html(newContent)
 
 }
 
 function nodeOut() {
+  var nextButton = document.getElementById("nextButton");
+  nextButton.style.backgroundColor = "green"
+  nextButton.removeAttribute("disabled");
+
   if (nodeFocus) {
     return
   }
