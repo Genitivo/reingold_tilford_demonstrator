@@ -1,8 +1,8 @@
 var tree_height = document.getElementById("tree_height").value
 
 var margin = {top: 20, right: 120, bottom: 20, left: 120},
-    width = $(document).width() - margin.right - margin.left,
-    height = $(document).height() - margin.top - margin.bottom
+    width = $(document).width()- 100 - margin.right - margin.left,
+    height = tree_height - margin.top - margin.bottom
 
 var i = 0,
     duration = 750,
@@ -11,16 +11,26 @@ var i = 0,
 var tree = d3.layout.tree()
     .size([height, width])
 
+    // Define the zoom function for the zoomable tree
+
+function zoom() {
+    svgGroup.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+}
 
 var diagonal = d3.svg.diagonal()
     .projection(function(d) { return [d.y, d.x] })
 
+var zoomListener = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoom);
+
 var svg_container = d3.select("body").append("svg")
     .attr("width", width + margin.right + margin.left)
     .attr("height", height + margin.top + margin.bottom)
+    .attr("class", "svg")
+    .call(zoomListener);
 
-var svg = svg_container.append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+var svgGroup = svg_container.append("g");
+
+var svg = svgGroup.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
 
 // create the editor
 var container = document.getElementById("jsoneditor")
@@ -240,23 +250,6 @@ function showChildren(d){
 currentOpenNode = null
 openNodes = []
 
-function nodiApertiALivello(lvl){
-
-  var n = 0
-  var figli = []
-  console.log(openNodes)
-
-  for(index = 0; index < openNodes.length; ++index){
-    var node = openNodes[index]
-
-    figli = node.children != undefined ? node.children : node._children
-    if(node.depth+1===lvl)
-      n += figli.length
-  }
-  return n
-
-}
-
 function showChildren(d){
   if (d.children) {
     d._children = d.children
@@ -268,16 +261,6 @@ function showChildren(d){
 
   update(d)
 
-}
-
-function isOpen(d){
-
-  for(index = 0; index < openNodes.length; ++index){
-    console.log(openNodes[index].id,d.id)
-    if(openNodes[index].id===d.id)
-      return true
-  }
-  return false
 }
 
 function updateJson(){
@@ -334,7 +317,6 @@ function nextSlide(){
         nodeForTutorial.push(d)
         currentParent = d.parent
         subtree = true
-        console.log("PADRE")
       }
 
       // CASO SECONDO FIGLIO OPPURE PADRE CON SINGOLO FIGLIO
@@ -345,17 +327,14 @@ function nextSlide(){
           currentParent = d.parent
           subtree = true
           i = i+1
-          console.log("NODO")
         }
       }else{
         // CASO NODO FOGLIA
         if( (i==1 || i==0) && !subtree){
-          console.log(d.parent,currentParent)
           if(d.parent===currentParent && !d.children){
             orderedNodes.push(d)
             nodeForTutorial.push(d)
             currentParent = d.parent
-            console.log("FOGLIA")
             i = i+1
 
           }
@@ -365,14 +344,7 @@ function nextSlide(){
     }
   })
 
-  console.log("___________________________")
-  nodeForTutorial.forEach((d) => console.log(d.name))
-  console.log("___________________________")
-
-
   showTutorial(nodeForTutorial)
-
-
 }
 
 function renderedAnimation(){
@@ -424,8 +396,15 @@ function renderedAnimation(){
 }
 
 function showTutorial() {
+  var node = svg.selectAll("g.node")
+      .data(nodeForTutorial, function(d) { return d.id || (d.id = ++i) })
+
+  node.select("circle")
+      .attr("r", 4.5)
+      .style("fill", function(d) { return d._children ? "red" : "red" })
+
   var nextButton = document.getElementById("nextButton");
-  nextButton.style.backgroundColor = "yellow"
+  nextButton.style.backgroundColor = "GoldenRod"
   nextButton.setAttribute("disabled","disabled");
 
   nodeFocus = false
@@ -435,10 +414,10 @@ function showTutorial() {
     case 1: {
       father = nodeForTutorial[0]
       if(father.id===root.id)
-        newContent += `<p> L'ascissa della radice <b> ${father.name} </b> viene posta alla metà della distanza dei suoi figli </p>`
+        newContent += `<p> L'ascissa della radice <b> ${father.name} </b> viene posta alla metà della distanza dei suoi figli. </p>`
       else{
-        newContent += `<p> Il nodo padre <b> ${father.name} </b> viene aggiunto ai sotto alberi riodinati </p>`
-        newContent += `<p> Le radici dei suoi sotto alberi figli, vengono posti ad una distanza minima di <b>2</b> </p>`
+        newContent += `<p> Il nodo padre <b> ${father.name} </b> viene aggiunto ai sotto alberi riodinati. </p>`
+        newContent += `<p> Le radici dei suoi sotto alberi figli, vengono posti ad una distanza minima di <b>2</b>. </p>`
       }
        break
     }
@@ -453,10 +432,9 @@ function showTutorial() {
         newContent += `<li><b> Figlio Destro:</b> ${child_dx.name} </li>`
         newContent += "</ul></p>"
 
-        newContent += `<p> Il figlio sinistro, viene posto alla giusta profondità rispetto nodo al padre </p>`
-        newContent += `<p> Il figlio destro, verrà processato insieme ai suoi figli nella prossima iterazione </p>`
+        newContent += `<p> Il figlio sinistro, viene posto ad una profondità standard rispetto nodo al padre. </p>`
+        newContent += `<p> Il figlio destro, verrà processato insieme ai suoi figli nella prossima iterazione. </p>`
 
-        orderedNodes.forEach((d) => console.log(d.name))
         orderedNodes.splice(orderedNodes.length-1,1)
         break
       }else{
@@ -465,7 +443,7 @@ function showTutorial() {
         newContent += `<li><b> Figlio:</b> ${child_sx.name} </li>`
         newContent += "</ul></p>"
 
-        newContent += `<p> Il nodo figlio <b>${child_sx.name}</b>, viene posto alla giusta profondità rispetto nodo al padre <b>${father.name}</b> </p>`
+        newContent += `<p> Il nodo figlio <b>${child_sx.name}</b>, viene posto alla giusta profondità rispetto nodo al padre <b>${father.name}</b>. </p>`
         break
       }
     }
@@ -480,7 +458,7 @@ function showTutorial() {
       newContent += `<li><b> Figlio Destro:</b> ${child_dx.name} </li>`
       newContent += "</ul></p>"
 
-      newContent += `<p> I figli vengono posti alla distanza minima e alla profondità standard rispetto al padre </p>`
+      newContent += `<p> I figli vengono posti fra loro alla distanza minima possibile e ad una profondità standard rispetto al padre. </p>`
       break
     }
   }
@@ -492,6 +470,14 @@ function nodeOut() {
   var nextButton = document.getElementById("nextButton");
   nextButton.style.backgroundColor = "green"
   nextButton.removeAttribute("disabled");
+
+  var node = svg.selectAll("g.node")
+      .data(nodeForTutorial, function(d) { return d.id || (d.id = ++i) })
+
+  node.select("circle")
+      .attr("r", 4.5)
+      .style("fill", function(d) { return d._children ? "white" : "white" })
+      .style("stroke", function(d) { return "green" })
 
   if (nodeFocus) {
     return
